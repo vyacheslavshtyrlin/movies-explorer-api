@@ -19,15 +19,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     select: false,
-    minlength: [2, 'Пароль должен быть больше 2-ух символов'],
-
   },
   name: {
     type: String,
     minlength: [2, 'Введите корректное имя'],
     maxlength: [30, 'Введите корректное имя'],
     required: true,
-    default: 'Жак-Ив Кусто',
   },
 });
 userSchema.statics.findUserByCredentials = function (password, email) {

@@ -13,7 +13,7 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       email: Joi.string().required().email(),
-      password: Joi.string().required().min(2),
+      password: Joi.string().required(),
     }),
   }),
   login,
@@ -24,7 +24,7 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       email: Joi.string().required().email(),
-      password: Joi.string().required().min(2),
+      password: Joi.string().required(),
       name: Joi.string().min(2).max(30),
     }),
   }),
@@ -34,7 +34,7 @@ router.post(
 router.use('/users', auth, usersRouter);
 router.use('/movies', auth, movieRouter);
 
-router.all('/*', () => {
+router.all('/*', auth, () => {
   throw new NotFoundErr('Ошибка 404');
 });
 

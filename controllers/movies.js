@@ -41,21 +41,21 @@ module.exports.createMovie = (req, res, next) => {
     .then((movie) => res.send(movie))
     .catch((error) => {
       if (error.name === 'ValidationError' || error.name === 'CastError') {
-        throw new BadRequest(error.message);
+        next(new BadRequest(error.message));
       }
-      throw error;
+      next(error);
     })
     .catch(next);
 };
 
 module.exports.deleteMovie = (req, res, next) => {
-  Movie.findById(req.params.cardId)
+  Movie.findById(req.params.moviesId)
     .orFail(() => {
-      throw new NotFound('Нет карточки по заданному id');
+      next(new NotFound('Нет карточки по заданному id'));
     })
     .then((movie) => {
       if (!movie.owner.equals(req.user._id)) {
-        throw new Forbidden('Нельзя удалять чужие фильмы');
+        next(new Forbidden('Нельзя удалять чужие фильмы'));
       }
       movie.remove()
         .then(() => res.send({ message: 'Фильм удален' }));
