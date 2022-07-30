@@ -32,29 +32,24 @@ module.exports.getUser = (req, res, next) => {
 
 module.exports.patchUser = (req, res, next) => {
   const { email, name } = req.body;
-  console.log(email, name);
-  User.findOne({ email }).then((user) => {
-    if (user && user._id !== req.user._id) {
-      next(new Conflict('Пользователь с таким e-mail уже есть'));
-    }
-    return User.findByIdAndUpdate(
-      req.user._id,
-      { email, name },
-      { new: true, runValidators: true },
-    )
-      .then((data) => {
-        console.log(data);
-        res.send({ name: data.name, email: data.email });
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error.name === 'ValidationError' || error.name === 'CastError') {
-          next(new BadRequest(error.message));
-        }
-        throw error;
-      });
-  })
-    .catch(next);
+  User.findByIdAndUpdate(
+    req.user._id,
+    { email, name },
+    { new: true, runValidators: true },
+  )
+    .then((data) => {
+      res.send({ name: data.name, email: data.email });
+    })
+    .catch((error) => {
+      console.log(error);
+      if (error.name === 'ValidationError' || error.name === 'CastError') {
+        next(new BadRequest(error.message));
+      } else if (error.code === 11000) {
+        next(new Conflict('Пользователь с таким e-mail уже зарегистрирован'));
+      } else {
+        next(error);
+      }
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -75,18 +70,18 @@ module.exports.createUser = (req, res, next) => {
         })
         .catch((error) => {
           if (error.code === 11000) {
-            next(new Conflict(
-              'Пользователь с таким e-mail уже зарегестрирован',
-            ));
+            next(
+              new Conflict('Пользователь с таким e-mail уже зарегестрирован'),
+            );
           } else if (
             error.name === 'ValidationError'
             || error.name === 'CastError'
           ) {
             next(new BadRequest(error.message));
+          } else {
+            next(error);
           }
-          next(error);
-        })
-        .catch(next);
+        });
     })
     .catch(next);
 };
