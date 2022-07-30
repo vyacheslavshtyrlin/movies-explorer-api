@@ -42,23 +42,27 @@ module.exports.createMovie = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'ValidationError' || error.name === 'CastError') {
         next(new BadRequest(error.message));
+      } else {
+        next(error);
       }
-      next(error);
-    })
-    .catch(next);
+    });
 };
 
 module.exports.deleteMovie = (req, res, next) => {
-  Movie.findById(req.params.moviesId)
+  const { movieId } = req.params;
+  Movie.findById(movieId)
     .orFail(() => {
       next(new NotFound('Нет карточки по заданному id'));
     })
     .then((movie) => {
       if (!movie.owner.equals(req.user._id)) {
         next(new Forbidden('Нельзя удалять чужие фильмы'));
+      } else {
+        Movie.findByIdAndDelete(movieId)
+          .then((deletedMovie) => {
+            res.status(200).send({ data: deletedMovie });
+          })
+          .catch(next);
       }
-      movie.remove()
-        .then(() => res.send({ message: 'Фильм удален' }));
-    })
-    .catch(next);
+    });
 };
