@@ -49,6 +49,17 @@ const movieSchema = new mongoose.Schema({
     },
   },
 
+  image: {
+    type: String,
+    required: true,
+    validate: {
+      validator(v) {
+        return validator.isURL(v);
+      },
+      message: 'Введите корректную ссылку',
+    },
+  },
+
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
