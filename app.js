@@ -11,7 +11,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const limiter = require('./middlewares/limiter');
 
 const corsOptions = {
-  origin: ['http://localhost:3001', 'http://moviesdiploma.nomoredomains.xyz'],
+  origin: ['http://localhost:3001', 'http://localhost:3000', 'http://moviesdiploma.nomoredomains.xyz'],
 };
 
 const app = express();
