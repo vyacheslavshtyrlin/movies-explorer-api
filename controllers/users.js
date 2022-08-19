@@ -26,7 +26,7 @@ module.exports.getUser = (req, res, next) => {
     .orFail(() => {
       next(new NotFound('Нет пользователя по заданному id'));
     })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({ user }))
     .catch(next);
 };
 
