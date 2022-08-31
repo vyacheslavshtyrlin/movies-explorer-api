@@ -9,15 +9,15 @@ const errorHeandler = require('./middlewares/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const limiter = require('./middlewares/limiter');
 
+
 const allowedCors = [
-  'http://localhost:3001',
+  'https://moviesdiploma.nomoredomains.xyz ',
   'http://localhost:3000',
-  'http://moviesdiploma.nomoredomains.xyz',
 ];
+
 
 const app = express();
 
-// eslint-disable-next-line consistent-return
 app.use((req, res, next) => {
   const { origin } = req.headers;
   const { method } = req;
@@ -36,6 +36,8 @@ app.use((req, res, next) => {
 
   next();
 });
+
+
 
 const { PORT = 3001, NODE_ENV, DATA_BASE } = process.env;
 
