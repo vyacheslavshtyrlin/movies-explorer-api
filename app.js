@@ -3,16 +3,37 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-const cors = require('cors');
 const helmet = require('helmet');
 const routes = require('./routes');
 const errorHeandler = require('./middlewares/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const limiter = require('./middlewares/limiter');
 
+const allowedCors = [
+  'https://moviesdiploma.nomoredomains.xyz ',
+  'http://localhost:3000',
+];
+
 const app = express();
-app.use(cors());
-// eslint-disable-next-line consistent-return
+
+app.use((req, res, next) => {
+  const { origin } = req.headers;
+  const { method } = req;
+  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+  const requestHeaders = req.headers['access-control-request-headers'];
+
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', true);
+  }
+  if (method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
+    res.header('Access-Control-Allow-Headers', requestHeaders);
+    return res.end();
+  }
+
+  next();
+});
 
 const { PORT = 3001, NODE_ENV, DATA_BASE } = process.env;
 
